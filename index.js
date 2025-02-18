@@ -9,7 +9,7 @@ function updateRef(ref, map) {
   const oldX = ref[2];
   const oldY = ref[3];
   if (!map[oldName]) {
-    console.log("No mapping found for", oldName);
+    //console.log("No mapping found for", oldName);
     return;
   }
 
@@ -178,7 +178,14 @@ function rePackSheets(source, destination) {
         fs.unlinkSync(newZipFilePath);
         zipFolder("temp", newZip);
         newZip
-          .generateNodeStream({ type: "nodebuffer", streamFiles: true })
+          .generateNodeStream({
+            type: "nodebuffer",
+            streamFiles: true,
+            compression: "DEFLATE",
+            compressionOptions: {
+              level: 9,
+            },
+          })
           .pipe(fs.createWriteStream(newZipFilePath))
           .on("finish", function () {
             console.log(`Zip file ${newZipFilePath} written.`);
