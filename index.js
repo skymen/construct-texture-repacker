@@ -4,6 +4,8 @@ var JSZip = require("jszip");
 
 // Load the JSON file
 
+let fileFormat = "webp";
+
 function updateRef(ref, map) {
   const oldName = ref[0];
   const oldX = ref[2];
@@ -82,6 +84,7 @@ function preserveOldSheets(filePath, doneCallback) {
         if (objectName && singleImageData) {
           const sheetName = singleImageData[0];
           if (sheetName) {
+            fileFormat = sheetName.split(".").pop();
             sheetNameMap[sheetName] = sheetNameMap[sheetName] || 0;
             sheetNameMap[sheetName]++;
           }
@@ -92,6 +95,7 @@ function preserveOldSheets(filePath, doneCallback) {
             for (const frame of frameData) {
               const sheetName = frame[0];
               if (sheetName) {
+                fileFormat = sheetName.split(".").pop();
                 sheetNameMap[sheetName] = sheetNameMap[sheetName] || 0;
                 sheetNameMap[sheetName]++;
               }
@@ -141,7 +145,7 @@ function rePackSheets(source, destination) {
   fs.mkdirSync(destination);
   const exec = require("child_process").exec;
   exec(
-    `"C:/Program Files/CodeAndWeb/TexturePacker/bin/TexturePacker.exe" config.tps --sheet ${destination}/sheet{n}.webp --data ${destination}/sheet{n}.json ${source}`,
+    `"C:/Program Files/CodeAndWeb/TexturePacker/bin/TexturePacker.exe" config.tps --sheet ${destination}/sheet{n}.${fileFormat} --data ${destination}/sheet{n}.json ${source}`,
     (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
@@ -158,7 +162,7 @@ function rePackSheets(source, destination) {
         fs.mkdirSync(source);
         const files = fs.readdirSync(destination);
         files.forEach((file) => {
-          if (file.endsWith(".webp")) {
+          if (file.endsWith(`.${fileFormat}`)) {
             maybeCreateFolders(`${source}/${file}`);
             fs.copyFileSync(`${destination}/${file}`, `${source}/${file}`);
           }
@@ -166,7 +170,7 @@ function rePackSheets(source, destination) {
 
         const files2 = fs.readdirSync("oldSheets/images");
         files2.forEach((file) => {
-          if (file.endsWith(".webp")) {
+          if (file.endsWith(`.${fileFormat}`)) {
             maybeCreateFolders(`${source}/${file}`);
             fs.copyFileSync(`oldSheets/images/${file}`, `${source}/${file}`);
           }
@@ -202,7 +206,7 @@ function createOldToNewMap(destination) {
   const oldToNewMap = {};
   sheetFiles.forEach((file) => {
     if (file.endsWith(".json")) {
-      const associatedImageData = file.replace(".json", ".webp");
+      const associatedImageData = file.replace(".json", `.${fileFormat}`);
       // get byte size of the image
       const stats = fs.statSync(`${destination}/${associatedImageData}`);
       const fileSizeInBytes = stats.size;
