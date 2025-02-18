@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "texturepacker-command-line": "^0.0.5"
+  }
+}
