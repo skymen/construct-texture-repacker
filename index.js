@@ -32,7 +32,11 @@ function handleDataJson(filePath, map, doneCallback) {
 
       for (const object of objectData) {
         const objectName = object[0];
+        const singleImageData = object[6];
         const animationData = object[7];
+        if (objectName && singleImageData) {
+          updateRef(singleImageData, map);
+        }
         if (objectName && animationData) {
           for (const animation of animationData) {
             const frameData = animation[7];
@@ -70,12 +74,35 @@ function preserveOldSheets(filePath, doneCallback) {
     try {
       const jsonData = JSON.parse(data);
       const objectData = jsonData["project"][3];
-
+      const sheetNameMap = {};
       for (const object of objectData) {
         const objectName = object[0];
         const singleImageData = object[6];
+        const animationData = object[7];
         if (objectName && singleImageData) {
           const sheetName = singleImageData[0];
+          if (sheetName) {
+            sheetNameMap[sheetName] = sheetNameMap[sheetName] || 0;
+            sheetNameMap[sheetName]++;
+          }
+        }
+        if (objectName && animationData) {
+          for (const animation of animationData) {
+            const frameData = animation[7];
+            for (const frame of frameData) {
+              const sheetName = frame[0];
+              if (sheetName) {
+                sheetNameMap[sheetName] = sheetNameMap[sheetName] || 0;
+                sheetNameMap[sheetName]++;
+              }
+            }
+          }
+        }
+      }
+
+      for (const sheetName in sheetNameMap) {
+        const sheetCount = sheetNameMap[sheetName];
+        if (sheetCount === 1) {
           maybeCreateFolders(`oldSheets/${sheetName}`);
           if (fs.existsSync(`temp/${sheetName}`)) {
             fs.copyFileSync(`temp/${sheetName}`, `oldSheets/${sheetName}`);
