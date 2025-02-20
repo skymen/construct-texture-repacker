@@ -35,3 +35,7 @@ node index.js
 ```
 
 or execute `run.bat`
+
+### Step 7:
+
+Your game is now zipped as `newGame.zip` in the root folder
