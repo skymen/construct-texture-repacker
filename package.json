@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "free-tex-packer-core": "^0.3.4",
     "jszip": "^3.10.1",
     "texturepacker-command-line": "^0.0.5"
   }

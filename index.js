@@ -1,10 +1,46 @@
 const fs = require("fs");
 const path = require("path");
 var JSZip = require("jszip");
+const { packAsync } = require("free-tex-packer-core");
 
 // Load the JSON file
 
 let fileFormat = "webp";
+
+function runFreeTexPacker(source, destination) {
+  const images = [
+    { path: "img1.png", contents: fs.readFileSync("./img1.png") },
+    { path: "img2.png", contents: fs.readFileSync("./img2.png") },
+    { path: "img3.png", contents: fs.readFileSync("./img3.png") },
+  ];
+  let options = {
+    textureName: "sheet",
+    suffix: "",
+    width: 2048,
+    height: 2048,
+    fixedSize: false,
+    powerOfTwo: true,
+    padding: 0,
+    allowRotation: false,
+    detectIdentical: false,
+    textureFormat: fileFormat,
+    allowTrim: false,
+    exporter: "Pixi",
+    prependFolderName: true,
+    packer: "OptimalPacker",
+  };
+
+  async function packImages() {
+    try {
+      const files = await packAsync(images, null);
+      for (let item of files) {
+        console.log(item.name, item.buffer);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+}
 
 function updateRef(ref, map) {
   const oldName = ref[0];
